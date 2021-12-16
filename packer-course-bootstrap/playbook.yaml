@@ -57,6 +57,6 @@
    
     - name: Activer le service au démarrage 
       ansible.builtin.service:
-        name: myip
+        name: golang-myip
         enabled: yes
         state: started
