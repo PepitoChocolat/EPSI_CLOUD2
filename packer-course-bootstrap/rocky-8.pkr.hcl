@@ -8,7 +8,7 @@ source "qemu" "example" {
   accelerator       = "kvm"
   http_directory    = "./ks"
   ssh_username      = "root"
-  ssh_password      = "root"
+  ssh_password      = "%Serveur44"
   ssh_timeout       = "20m"
   qemu_binary       = "/usr/libexec/qemu-kvm"
   display           = "none"
@@ -19,7 +19,7 @@ source "qemu" "example" {
   disk_interface    = "virtio"
   //Time waited by packer before do any action
   boot_wait         = "10s"
-  boot_command      = ["<tab> text inst.ks=http://192.168.122.1:{{ .HTTPPort }}/rocky-8.cfg<enter><wait>"]
+  boot_command      = ["<tab> text inst.ks=http://192.168.1.22:{{ .HTTPPort }}/rocky-8.cfg<enter><wait>"]
 }
 
 build {

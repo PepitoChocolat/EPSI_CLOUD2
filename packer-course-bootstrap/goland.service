@@ -1,0 +1,11 @@
+[Unit]
+Description=golang-myip
+
+[Service]
+User=root
+WorkingDirectory=/golang-myip
+ExecStart=/golang-myip/build/server.x86_64
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

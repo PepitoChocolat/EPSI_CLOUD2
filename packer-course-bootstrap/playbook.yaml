@@ -2,24 +2,57 @@
 - hosts: all
   become: yes
   tasks:
-    - name: Install package GIT
+    - name: Installation de GIT
       package:
         name: git
         state: latest
-    - name: Install package GOLANG
-          package:
-            name: golang
-            state: latest
-    - name: Install package make
-          package:
-            name: make
-            state: latest
-    - name: Example clone of a single branch
-          ansible.builtin.git:
-            repo: https://github.com/BastienBalaud/golang-myip.git
-            dest: /root/
-    - name: Build 'all' target with a custom Makefile
-      community.general.make:
-        chdir: /root/golang-myip
-        target: all
-        file: /Makefile
+        
+    - name: Installation de GOLANG
+      package:
+        name: golang
+        state: latest
+        
+    - name: Installation de MAKE
+      package:
+        name: make
+        state: latest
+         
+    - name: Clone de GOLANG-MYIP depuis Github
+      ansible.builtin.git:
+        repo: https://github.com/BastienBalaud/golang-myip.git
+        dest: /golang-myip
+
+    - name: Remplacer la configuration de server.go
+      ansible.builtin.lineinfile:
+       dest: /golang-myip/server.go
+       regexp: 'args.Port = 8080'
+       line: 'args.Port = 80'
+
+    - name: Shell MAKE
+      ansible.builtin.shell:
+       cmd: make
+       chdir: /golang-myip
+    
+    - name: Déplacement du fichier service dans systemd
+      copy: src=./golang.service dest=/etc/systemd/system/golang.service owner=root group=root mode=0755
+        
+    - name: Passage de SElinux en "permissive"
+      ansible.posix.selinux:
+        policy: targeted
+        state: permissive
+    
+    - name: Force le systeme à relire sa configuration (daemon-reload)
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        
+    - name: Configuration du lancement du service GOLANG au démarrage
+      ansible.builtin.service:
+       name: golang
+       enabled: yes
+    
+    - name: Ajout des clés SSH de l'intervenant
+      authorized_key:
+       user: root
+       state: present
+       key: https://github.com/BastienBalaud.keys
+       
